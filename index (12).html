@@ -1,0 +1,685 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                    headerRowIndex = 0;
+                }
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+    }
+</script><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Tool SCODE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 100%);
+            min-height: 100vh;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .dark body {
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%);
+        }
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.7;
+        }
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+            background-size: 400%;
+            animation: gradientFlow 15s ease infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .dark .background-overlay {
+            background: linear-gradient(45deg, rgba(30, 27, 75, 0.3), rgba(76, 29, 149, 0.3), rgba(147, 51, 234, 0.3));
+        }
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #f0f0f0);
+            border: none;
+            transform-style: preserve-3d;
+        }
+        .dark .feature-card {
+            background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+        }
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+            background: linear-gradient(145deg, #f0f0f0, #e5e7eb);
+            background-clip: padding-box;
+            border-image: linear-gradient(45deg, #2563eb, #a855f7, #ec4899) 1;
+        }
+        .dark .feature-card:hover {
+            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+        }
+        .feature-card i {
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover i {
+            transform: scale(1.2) rotate(10deg);
+        }
+        .download-btn {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+            background-color: #2563eb;
+        }
+        .download-btn:hover {
+            transform: scale(1.05);
+            background-color: #a855f7;
+        }
+        .download-btn::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+        }
+        .download-btn:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.2s ease;
+        }
+        .vip-btn {
+            background: linear-gradient(45deg, #d4af37, #f1c40f);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        .vip-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #f1c40f, #d4af37);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+        }
+        .vip-btn::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+        }
+        .vip-btn:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.2s ease;
+        }
+        .header-bg {
+            background: linear-gradient(to right, #1e40af, #1e3a8a);
+            position: relative;
+            overflow: hidden;
+        }
+        .dark .header-bg {
+            background: linear-gradient(to right, #1e293b, #0f172a);
+        }
+        .header-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: lightWave 8s infinite;
+        }
+        @keyframes lightWave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
+        }
+        .feature-card h2 {
+            color: #1f2937;
+        }
+        .dark .feature-card h2 {
+            color: #f3f4f6;
+        }
+        .feature-card p {
+            color: #4b5563;
+        }
+        .dark .feature-card p {
+            color: #d1d5db;
+        }
+        .main-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.8), 0 0 25px rgba(236, 72, 153, 0.6);
+            background: linear-gradient(45deg, #2563eb, #a855f7, #ec4899, #2563eb);
+            background-size: 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.5);
+            animation: gradientMove 3s ease infinite, sparkle 1.5s ease-out;
+            transition: transform 0.3s ease;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .main-title:hover {
+            transform: scale(1.05);
+        }
+        .main-title::before, .main-title::after {
+            content: '🌟';
+            position: absolute;
+            font-size: 1.5rem;
+            animation: spinStar 4s linear infinite;
+        }
+        .main-title::before {
+            left: -2rem;
+            animation-delay: 0s;
+        }
+        .main-title::after {
+            right: -2rem;
+            animation-delay: 2s;
+        }
+        @keyframes spinStar {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .main-description {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 300;
+            font-size: 1.5rem;
+            font-style: italic;
+            background: linear-gradient(45deg, #fefcbf, #fef3c7, #fefcbf);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMove 5s ease infinite;
+        }
+        .dark .main-description {
+            background: linear-gradient(45deg, #c4b5fd, #a78bfa, #c4b5fd);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .main-description span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: waveIn 0.5s ease forwards;
+        }
+        .main-description span:nth-child(1) { animation-delay: 0.1s; }
+        .main-description span:nth-child(2) { animation-delay: 0.2s; }
+        .main-description span:nth-child(3) { animation-delay: 0.3s; }
+        .main-description span:nth-child(4) { animation-delay: 0.4s; }
+        .main-description span:nth-child(5) { animation-delay: 0.5s; }
+        .main-description span:nth-child(6) { animation-delay: 0.6s; }
+        .main-description span:nth-child(7) { animation-delay: 0.7s; }
+        @keyframes waveIn {
+            0% { opacity: 0; transform: translateX(-20px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+        .parallax {
+            transition: transform 0.3s ease-out;
+        }
+        .explore-btn {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #2563eb, #a855f7);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .explore-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+        }
+        .explore-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        .explore-btn:hover::before {
+            left: 100%;
+        }
+        .social-icon {
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .social-icon:hover {
+            color: #a855f7;
+            transform: scale(1.2);
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            animation: logoSpin 10s linear infinite;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.1);
+        }
+        @keyframes logoSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .audio-btn {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #2563eb, #a855f7);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+        }
+        .audio-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        .audio-btn:hover::before {
+            left: 100%;
+        }
+        .text-gold-500 {
+            color: #d4af37;
+        }
+    </style>
+</head>
+<body class="text-gray-900 dark:text-gray-100">
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    <!-- Gradient Overlay -->
+    <div class="background-overlay"></div>
+
+    <!-- Audio -->
+    <audio id="background-audio" autoplay loop>
+        <source src="https://raw.githubusercontent.com/username/repository/main/audio.mp3" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ thẻ âm thanh.
+    </audio>
+
+    <!-- Header -->
+    <header class="header-bg shadow-lg">
+        <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center">
+            <img src="https://raw.githubusercontent.com/thienton85/Fff/refs/heads/main/IMG_20250424_105030.jpg" alt="SCODE Logo" class="logo mb-4">
+            <h1 class="main-title parallax">Công Cụ Tool SCODE</h1>
+            <p class="mt-4 main-description parallax">
+                <span>Tải</span> <span>các</span> <span>công</span> <span>cụ</span> <span>SCODE</span> <span>mạnh</span> <span>mẽ</span> <span>cho</span> <span>dự</span> <span>án</span> <span>của</span> <span>bạn!</span>
+            </p>
+            <div class="mt-6 flex gap-4">
+                <button id="theme-toggle" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    <i class="fas fa-moon"></i> Chuyển chế độ
+                </button>
+                <button id="audio-toggle" class="audio-btn">
+                    <i class="fas fa-volume-up"></i> Tắt Âm Thanh
+                </button>
+                <a href="#main-content" class="explore-btn">Khám phá SCODE</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- File 1: File .py -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-file-code text-4xl text-blue-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">File Tool Scode</h2>
+                        <p class="text-gray-700 dark:text-gray-300">File tool python.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/r0rq8dkaklzxja7/scodev7.py/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 2: Termux APK -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-terminal text-4xl text-green-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Termux APK</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Ứng dụng Termux cho Android.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/v99jfwyd5shfnh7/Termux_0.119.1_apkcombo.com.apk/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 3: Lệnh Setup .txt -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-file-lines text-4xl text-orange-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Lệnh Setup TXT</h2>
+                        <p class="text-gray-700 dark:text-gray-300">File văn bản chứa lệnh setup termux.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/ughox17iv39iova/setupsc.txt/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 4: Eruda APK -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-bug text-4xl text-purple-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Eruda APK</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Công cụ lấy auth và token golike.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/7gmua7ta7rk5jjk/Eruda+-+Browser+Console_21_APKPure.xapk/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 5: Get Cookie .zip -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-file-zipper text-4xl text-yellow-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Get Cookie ZIP</h2>
+                        <p class="text-gray-700 dark:text-gray-300">File nén chứa công cụ lấy cookie.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/rk6khd6lld8e7fl/downloadgetcookieforfplus.zip/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 6: 1.1.1.1 APK -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-shield text-4xl text-gray-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">1.1.1.1 APK</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Ứng dụng DNS bảo mật từ Cloudflare.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://www.mediafire.com/file/aicknlgvypjk6pt/com-cloudflare-onedotonedotonedotone-3837-66752135-ef8b2f5f382404189163d4d14c3128a8.apk/file')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 7: Quetta APK -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-rocket text-4xl text-red-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Quetta</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Ứng dụng Quetta cho Android.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://play.google.com/store/apps/details?id=net.quetta.browser')">
+                    <i class="fas fa-download mr-2"></i> Tải Xuống
+                </button>
+            </div>
+
+            <!-- File 8: Group Zalo -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-users text-4xl text-teal-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Group Zalo</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Tham gia nhóm Zalo hỗ trợ.</p>
+                    </div>
+                </div>
+                <button class="download-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://zalo.me/g/nexigi855')">
+                    <i class="fas fa-link mr-2"></i> Tham Gia
+                </button>
+            </div>
+
+            <!-- File 9: Mua Key VIP -->
+            <div class="feature-card rounded-xl shadow-lg p-6 cursor-pointer">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-key text-4xl text-gold-500"></i>
+                    <div>
+                        <h2 class="text-xl font-semibold mb-1">Mua Key VIP</h2>
+                        <p class="text-gray-700 dark:text-gray-300">Key VIP Tool Scode.</p>
+                    </div>
+                </div>
+                <button class="vip-btn mt-4 w-full text-white py-2 rounded-lg" onclick="redirectTo('https://sellgame.shop')">
+                    <i class="fas fa-shopping-cart mr-2"></i> Mua Ngay
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="mb-2">Tạo bởi NVĐ | Tải công cụ SCODE với <a href="https://www.mediafire.com" class="text-blue-400 hover:underline">MediaFire</a></p>
+            <p class="text-sm text-gray-400">Liên hệ: <a href="/cdn-cgi/l/email-protection#d8abada8a8b7aaac98abbbb7bcbdf6bbb7b5" class="text-blue-400 hover:underline"><span class="__cf_email__" data-cfemail="47747277776875734774646863622964686a">[email&#160;protected]</span></a></p>
+            <div class="mt-4 flex justify-center gap-6">
+                <a href=" https://zalo.me/g/nexigi855" class="social-icon text-2xl"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://t.me/your_telegram" class="social-icon text-2xl"><i class="fab fa-telegram"></i></a>
+                <a href="https://github.com/username/repository" class="social-icon text-2xl"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+    </script>
+    <script>
+        // Khởi tạo Particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 150, density: { enable: true, value_area: 1000 } },
+                color: { value: ['#2563eb', '#a855f7', '#ec4899', '#ffffff'] },
+                shape: { type: ['circle', 'star', 'triangle', 'polygon'], polygon: { nb_sides: 5 } },
+                opacity: { value: 0.7, random: true, anim: { enable: true, speed: 1, opacity_min: 0.3 } },
+                size: { value: 5, random: true, anim: { enable: true, speed: 2, size_min: 2 } },
+                line_linked: { enable: true, distance: 150, color: '#a855f7', opacity: 0.3, width: 1 },
+                move: { enable: true, speed: 4, direction: 'none', random: true, out_mode: 'bounce' }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: ['grab', 'bubble'] }, onclick: { enable: true, mode: 'push' } },
+                modes: {
+                    grab: { distance: 200, line_linked: { opacity: 0.5 } },
+                    bubble: { distance: 300, size: 10, duration: 2, opacity: 0.8 },
+                    push: { particles_nb: 5 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Chuyển hướng liên kết
+        function redirectTo(url) {
+            window.location.href = url;
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i> Chuyển chế độ' : '<i class="fas fa-moon"></i> Chuyển chế độ';
+        });
+
+        // Audio toggle
+        const audio = document.getElementById('background-audio');
+        const audioToggle = document.getElementById('audio-toggle');
+        let isPlaying = true;
+        audioToggle.innerHTML = '<i class="fas fa-volume-up"></i> Tắt Âm Thanh';
+        audioToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioToggle.innerHTML = '<i class="fas fa-volume-mute"></i> Bật Âm Thanh';
+            } else {
+                audio.play();
+                audioToggle.innerHTML = '<i class="fas fa-volume-up"></i> Tắt Âm Thanh';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Parallax effect for content and background
+        window.addEventListener('scroll', () => {
+            const parallaxElements = document.querySelectorAll('.parallax');
+            const backgroundOverlay = document.querySelector('.background-overlay');
+            parallaxElements.forEach(el => {
+                const speed = 0.3;
+                const yPos = -(window.pageYOffset * speed);
+                el.style.transform = `translateY(${yPos}px)`;
+            });
+            // Background parallax
+            const bgSpeed = 0.1;
+            const bgPos = -(window.pageYOffset * bgSpeed);
+            backgroundOverlay.style.transform = `translateY(${bgPos}px)`;
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9353af313a4abf69',t:'MTc0NTQ3NzYxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
